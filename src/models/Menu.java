@@ -1,45 +1,45 @@
 package models;
 
 public class Menu {
-    private String name;
-    private String type;
-    private Double price;
-
+    private String nama;
+    private String jenis;
+    private Double harga;
+    
     public Menu() {
     }
     
-    public Menu(String name, String type, Double price) {
-        this.setName(name);
-        this.setType(type);
-        this.setPrice(price);
+    public Menu(String nama, String jenis, Double harga) {
+        this.nama = nama;
+        this.jenis = jenis;
+        this.harga = harga;
     }
 
-    public String getName() {
-        return name;
+    public String getNama() {
+        return nama;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setNama(String nama) {
+        this.nama = nama;
     }
 
-    public String getType() {
-        return type;
+    public String getJenis() {
+        return jenis;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setJenis(String jenis) {
+        this.jenis = jenis;
     }
 
-    public Double getPrice() {
-        return price;
+    public Double getHarga() {
+        return harga;
     }
 
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setHarga(Double harga) {
+        this.harga = harga;
     }
 
     @Override
     public String toString() {
-        return name + " - Rp " + price;
+        return nama + " - Rp " + harga;
     }
 }

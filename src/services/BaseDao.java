@@ -9,5 +9,4 @@ public interface BaseDao<E, ID> {
     Integer getSize();
     void update(ID id, E data);
     void delete(ID id);
-    void deleteAll();
 }

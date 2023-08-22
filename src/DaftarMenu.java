@@ -4,8 +4,9 @@ public class DaftarMenu {
         System.out.println("");
         System.out.println("""
                 1. Daftar Menu
-                2. Masukkan Pesanan
+                2. Pesanan
                 3. Pembayaran
+                4. Keluar
                 """);
         System.out.print("Pilihan : ");
     }
@@ -17,18 +18,6 @@ public class DaftarMenu {
                 3. Paket
                 """);
         System.out.print("Pilihan : ");
-    }
-
-    public static void menuPaket(){
-        System.out.println("""
-                ==== MENU PAKET ====
-                 55
-                 49
-                 58
-                 1 - 4 41
-                4 34
-                 56
-                """);
     }
 
     public static void menuLengkap(){

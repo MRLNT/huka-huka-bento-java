@@ -1,21 +1,20 @@
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
 import dao.MenuDao;
-import dao.OrderDao;
+import dao.PesananDao;
 import services.menu.MenuService;
 import services.menu.MenuServiceImplementation;
-import services.order.OrderService;
-import services.order.OrderServiceImplementation;
-import services.payment.PaymentService;
-import services.payment.PaymentServiceImplementation;
+import services.pembayaran.PaymentService;
+import services.pembayaran.PaymentServiceImplementation;
+import services.pemesanan.OrderService;
+import services.pemesanan.OrderServiceImplementation;
 import models.Menu;
-import models.Order;
+import models.Pesanan;
 
 public class Main {
     static Scanner sc = new Scanner(System.in);
@@ -23,78 +22,55 @@ public class Main {
     static MenuDao menuDao = new MenuDao();
     static MenuService menuService = new MenuServiceImplementation(menuDao);
 
-    static OrderDao orderDao = new OrderDao();
+    static PesananDao orderDao = new PesananDao();
     static OrderService orderService = new OrderServiceImplementation(orderDao);
 
     static PaymentService paymentService = new PaymentServiceImplementation();
 
-    public static void main(String[] args) {
-        menuTambah();
-        try {
-            Boolean ulang = true;
-            Integer pilihanMenu;
-            
-            while (ulang) {
-                try {
-                    do {
-                        System.out.print("""
-                        ==== HUKA HUKA BENTO ====
-                        1. Daftar Menu
-                        2. Pesan
-                        3. Pembayaran
-                        4. Exit
-                        Pilihan :  """);
-                        pilihanMenu = sc.nextInt();
-                        sc.nextLine();
+    private static void lihatDaftarMenu() {
+        daftarMenu("Makanan");
+        daftarMenu("Minuman");
+        daftarMenu("Paket");
+    }
 
-                        switch (pilihanMenu) {
-                            case 1:
-                                lihatDaftarMenu();
-                                break;
-                            case 2:
-                                manajemenPesanan();
-                                break;
-                            case 3:
-                                pembayaran();
-                                break;
-                            // case 4:
-                            //     manajemenMenu();
-                            //     break;
-                            case 4: 
-                                System.out.println("Anda telah keluar dari sistem...");
-                                ulang = false;
-                                break;
-                            default:
-                                System.out.println("Pilihan tidak tersedia...\n");
-                        }
-                    } while (pilihanMenu > 4 || pilihanMenu < 1);
+    private static List<Menu> filterMenu(String type) {
+        List<Menu> menus = menuService.getAllMenus();
+        List<Menu> filteredMenus;
+        List<String> menuType = Arrays.asList(type);
 
-                    while (ulang) {
-                        System.out.print("\nIngin melakukan pemesanan, pembayaran, atau manajemen menu? (y|n) ");
-                        String again = sc.nextLine();
-                            
-                        if ("y".equalsIgnoreCase(again)) {
-                            break;
-                        } else if ("n".equalsIgnoreCase(again)) {
-                            ulang = false;
-                            System.out.println("Anda telah keluar");
-                            break;
-                        } else {
-                            System.out.println("Ketik y atau n saja");
-                            continue;
-                        }
-                    }
-                } catch (InputMismatchException inputMismatchException) {
-                    System.out.println("Pesan error : data yang diinputkan tidak sesuai dengan tipe datanya");
-                    ulang = false;
-                } catch (Exception exception) {
-                    System.out.print(exception.getMessage());
-                }
-            }
-        } finally {
-            sc.close();
+        filteredMenus = menus.stream().filter(menu -> menuType.contains(menu.getJenis())).collect(Collectors.toList());
+
+        return filteredMenus;
+    }
+
+    private static void daftarMenu(String type) {
+        System.out.println("\n=== MENU " + type.toUpperCase() + " ===");
+        
+        List<Menu> filteredMenus = filterMenu(type);
+
+        for (int i = 0; i < filteredMenus.size(); i++) {
+            System.out.println((i + 1) + ". " + filteredMenus.get(i));
         }
     }
+
+    private static Boolean pengulangan(String menu) {
+        Boolean pengulangan = false;
+        String pilihan;
+
+        System.out.print("Apakah anda ingin " + menu + " (y/n): ");
+        pilihan = sc.nextLine();
+
+        if ("y".equalsIgnoreCase(pilihan)) {
+            pengulangan = true;
+        } else if ("n".equalsIgnoreCase(pilihan)) {
+            pengulangan = false;
+        } else {
+            System.out.println("Ketik y atau n saja");
+        }
+        
+        return pengulangan;
+    }
+
     private static void menuTambah(){
         Menu[] menus = {
             new Menu("HOKA HEMAT 1,2,3,4", "Makanan", 27000.),
@@ -125,65 +101,18 @@ public class Main {
         System.out.flush();
     }
 
-    private static Boolean konfirmasi(String menu) {
-        Boolean konfirmasi = false;
-        String pilihan;
 
-        System.out.print("Apakah anda ingin " + menu + " (y|n): ");
-        pilihan = sc.nextLine();
+    
 
-        if ("y".equalsIgnoreCase(pilihan)) {
-            konfirmasi = true;
-        } else if ("n".equalsIgnoreCase(pilihan)) {
-            konfirmasi = false;
-        } else {
-            System.out.println("Ketik y atau n saja");
-        }
-        
-        return konfirmasi;
-    }
-
-    private static List<Menu> filterMenus(String type) {
-        List<Menu> menus = menuService.getAllMenus();
-        List<Menu> filteredMenus;
-        List<String> menuType = Arrays.asList(type);
-
-        filteredMenus = menus.stream().filter(menu -> menuType.contains(menu.getType())).collect(Collectors.toList());
-
-        return filteredMenus;
-    }
-
-    private static void printDataDariList(String type) {
-        System.out.println("\n====== MENU " + type.toUpperCase() + " ======");
-        
-        List<Menu> filteredMenus = filterMenus(type);
-
-        for (int i = 0; i < filteredMenus.size(); i++) {
-            System.out.println((i + 1) + ". " + filteredMenus.get(i));
-        }
-    }
-
-    private static void lihatDaftarMenu() {
-        printDataDariList("Makanan");
-        printDataDariList("Minuman");
-        printDataDariList("Paket");
-    }
+    
     
     private static void manajemenPesanan() {
         Integer pilihanSubMenu;
 
         do {
-            System.out.print("""
-            
-            ====== MANAJEMEN PESANAN ======
-            1. Tambah Pesanan
-            2. Ubah Pesanan
-            3. Hapus Pesanan
-            4. Batalkan Semua Pesanan
-            Pilihan :  """);
+            DaftarMenu.menuPesan();
             pilihanSubMenu = sc.nextInt();
             sc.nextLine();
-
             switch (pilihanSubMenu) {
                 case 1: 
                     tambahPesanan();
@@ -194,9 +123,6 @@ public class Main {
                 case 3: 
                     hapusPesanan();
                     break;
-                case 4: 
-                    batalkanSemuaPesanan();
-                    break;
                 default:
                     System.out.println("Pilihan tidak tersedia...");
             }
@@ -204,21 +130,21 @@ public class Main {
         } while (pilihanSubMenu > 4 || pilihanSubMenu < 1);
     }
     
-    private static Double getHargaSebelumPPN() {
+    private static Double hargaSebelumPPN() {
         Double hargaSebelumPajak = 0.;
 
         for (int i = 1; i <= orderService.getNumberOfOrders(); i++) {
-            hargaSebelumPajak += orderService.getOrderById(i).getPriceBeforeTax();
+            hargaSebelumPajak += orderService.getOrderById(i).getHargaAwal();
         }
 
         return hargaSebelumPajak;
     }
 
-    private static Double getPPN() {
+    private static Double tambahPPN() {
         Double ppn = 0.;
 
         for (int i = 1; i <= orderService.getNumberOfOrders(); i++) {
-            ppn += orderService.getOrderById(i).getTax();
+            ppn += orderService.getOrderById(i).getPajak();
         }
 
         return ppn;
@@ -226,14 +152,14 @@ public class Main {
     
     private static void printListPesanan() {
         if (orderService.getNumberOfOrders() > 0) { 
-            System.out.println("\n====== PESANAN ANDA ======");
+            System.out.println("\n=== PESANAN ANDA ===");
             
             for (int i = 1; i <= orderService.getNumberOfOrders(); i++) {
                 System.out.println(i + ". " + orderService.getOrderById(i));
             }
 
-            System.out.println("Total harga : Rp " + getHargaSebelumPPN());
-            System.out.println("Total harga setelah PPN (11%) : Rp " + (getHargaSebelumPPN() + getPPN()));
+            System.out.println("Total harga : Rp " + hargaSebelumPPN());
+            System.out.println("Total harga setelah PPN (11%) : Rp " + (hargaSebelumPPN() + tambahPPN()));
         } else {
             System.out.println("Belum ada pesanan");
         }
@@ -241,23 +167,19 @@ public class Main {
 
     private static void pesanMenu(String type) {
         Integer idMenu, jumlah;
-        printDataDariList(type);
+        daftarMenu(type);
 
-        System.out.print("Masukan nomor " + type.toLowerCase() + " yang ingin dipesan : ");
+        System.out.print("Masukan nomor index pesanan : ");
         idMenu = sc.nextInt();
         sc.nextLine();
-        System.out.print("Masukan jumlah " + type.toLowerCase() + " yang ingin dipesan : ");
+        System.out.print("Masukan jumlah pesanan : ");
         jumlah = sc.nextInt();
         sc.nextLine();
 
-        if (konfirmasi("menambah pesanan")) {
-            List<Menu> filteredMenus = filterMenus(type);
-        
-            if (idMenu < 1 || idMenu > filteredMenus.size()) {
-                //throw new OrderException("Menu tidak tersedia...\n\n");
-            }
+        if (pengulangan("menambah pesanan")) {
+            List<Menu> filteredMenus = filterMenu(type);
 
-            Order order = new Order(filteredMenus.get(idMenu - 1), jumlah);
+            Pesanan order = new Pesanan(filteredMenus.get(idMenu - 1), jumlah);
             orderService.createOrder(order);
             printListPesanan();
         }
@@ -267,13 +189,7 @@ public class Main {
         Integer pilihanSubMenu;
 
         do {
-            System.out.print("""
-            
-            ====== PESAN MENU  ======
-            1. Menu Makanan
-            2. Menu Minuman
-            3. Menu Paket
-            Pilihan :  """);
+            DaftarMenu.menuPesan();
             pilihanSubMenu = sc.nextInt();
             sc.nextLine();
 
@@ -316,8 +232,8 @@ public class Main {
             jumlah = sc.nextInt();
             sc.nextLine();
 
-            if (konfirmasi("mengubah pesanan")) {
-                Order order = new Order(menuService.getMenuById(idMenu), jumlah);
+            if (pengulangan("mengubah pesanan")) {
+                Pesanan order = new Pesanan(menuService.getMenuById(idMenu), jumlah);
                 orderService.updateOrder(id, order);
 
                 printListPesanan();
@@ -336,7 +252,7 @@ public class Main {
             id = sc.nextInt();
             sc.nextLine();
 
-            if (konfirmasi("menghapus pesanan")) {
+            if (pengulangan("menghapus pesanan")) {
                 orderService.deleteOrder(id);
 
                 printListPesanan();
@@ -346,26 +262,18 @@ public class Main {
         }
     }
 
-    private static void batalkanSemuaPesanan() {
-        if (konfirmasi("membatalkan semua pesanan")) {
-            orderService.deleteAllOrders();
-        }
-    }
-
-    private static void printStruk(Double uangCustomer) {
-        System.out.println("\n====== BUKTI PEMBAYARAN ======");
+    private static void strukPembayaran(Double uangCustomer) {
+        System.out.println("\n=== BUKTI PEMBAYARAN ===");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMM uuuu HH:mm:ss");
         System.out.println("Tanggal : " + LocalDateTime.now().format(formatter));
 
         printListPesanan();
 
-        System.out.println("Biaya PPN (11%) : Rp " + getPPN());
-        System.out.println("Total harga : Rp " + (getHargaSebelumPPN() + getPPN()));
+        System.out.println("Biaya PPN (11%) : Rp " + tambahPPN());
+        System.out.println("Total harga : Rp " + (hargaSebelumPPN() + tambahPPN()));
         System.out.println("Uang Tunai : Rp " + uangCustomer);
-        System.out.println("Kembalian : Rp " + (uangCustomer - (getHargaSebelumPPN() + getPPN())));
-        System.out.println("Terima Kasih. Silahkan datang kembali~");
-
-        orderService.deleteAllOrders();
+        System.out.println("Kembalian : Rp " + (uangCustomer - (hargaSebelumPPN() + tambahPPN())));
+        System.out.println("Terima Kasih..");
     }
 
     private static void pembayaran() {
@@ -375,100 +283,73 @@ public class Main {
         
         if (orderService.getNumberOfOrders() > 0) {
             do {
-                System.out.print("Masukan Nominal Uang Tunai : Rp ");
+                System.out.print("Masukan Uang : Rp ");
                 uangCustomer = sc.nextDouble();        
                 sc.nextLine();
 
-                if (paymentService.bayar((getHargaSebelumPPN() + getPPN()), uangCustomer) != true) {
-                    System.out.println("Uang yang diberikan kurang...");
+                if (paymentService.bayar((hargaSebelumPPN() + tambahPPN()), uangCustomer) != true) {
+                    System.out.println("Uang Kurang...");
                 } else {
-                    printStruk(uangCustomer);
+                    strukPembayaran(uangCustomer);
                 }
 
-            } while (paymentService.bayar((getHargaSebelumPPN() + getPPN()), uangCustomer) != true);
+            } while (paymentService.bayar((hargaSebelumPPN() + tambahPPN()), uangCustomer) != true);
         }         
     }
 
-    private static void manajemenMenu() {
-        Integer id, pilihanSubMenu;
-        String nama, tipe;
-        Double harga;
-        Menu menu;
 
-        do {
-            System.out.print("""
-            
-            ====== Manajemen Menu  ======
-            1. Tambah Menu
-            2. Edit Menu
-            3. Hapus Menu
-            Pilihan :  """);
-            pilihanSubMenu = sc.nextInt();
-            sc.nextLine();
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        menuTambah();
+        try {
+            boolean ulang = true;
+            while (ulang) {
+                try {
+                    boolean ulang2 = true;
+                    while (ulang2) {
+                        DaftarMenu.menuUtama();
+                        int pilihanMenu = sc.nextInt();
+                        sc.nextLine();
 
-            switch (pilihanSubMenu) {
-                case 1: 
-                    System.out.println("\n====== TAMBAH MENU ======");
-                    System.out.print("Masukan nama menu : ");
-                    nama = sc.nextLine();
-                    System.out.print("Masukan tipe menu (Makanan/Minuman/Paket) : ");
-                    tipe = sc.nextLine();
-                    System.out.print("Masukan harga menu : ");
-                    harga = sc.nextDouble();
-                    sc.nextLine();
-
-                    if (konfirmasi("menambah menu")) {
-                        menu = new Menu(nama, tipe, harga);
-                        menuService.createMenu(menu);
+                        switch (pilihanMenu) {
+                            case 1:
+                                lihatDaftarMenu();
+                                break;
+                            case 2:
+                                manajemenPesanan();
+                                break;
+                            case 3:
+                                pembayaran();
+                                break;
+                            case 4:
+                                System.out.println("Terima kasih..");
+                                ulang = false;
+                                break;
+                            default:
+                                System.out.println("Salah input..\n");
+                        }
                     }
 
-                    break;
-                case 2: 
-                    System.out.println("\n====== EDIT MENU ======");
-                    System.out.println("Menu yang terdaftar : ");
-                    
-                    for (int i = 1; i <= menuService.getNumberOfMenus(); i++) {
-                        System.out.println((i) + ". " + menuService.getMenuById(i));
-                    }
+                    while (ulang) {
+                        System.out.print("\nApakah lihat menu, pesan lagi, atau bayar ? (y/n)");
+                        String again = sc.nextLine();
 
-                    System.out.print("Masukan id menu yang ingin diubah : ");
-                    id = sc.nextInt();
-                    sc.nextLine();
-                    System.out.print("Masukan nama menu [boleh dikosongkan]: ");
-                    nama = sc.nextLine();
-                    System.out.print("Masukan tipe menu (Makanan/Minuman/Paket) [boleh dikosongkan]: ");
-                    tipe = sc.nextLine();
-                    System.out.print("Masukan harga menu : ");
-                    harga = sc.nextDouble();
-                    sc.nextLine();
-                    
-                    if (konfirmasi("mengedit menu")) {
-                        menu = new Menu(nama, tipe, harga);
-                        menuService.updateMenu(id, menu);
+                        if ("y".equalsIgnoreCase(again)) {
+                            break;
+                        } else if ("n".equalsIgnoreCase(again)) {
+                            ulang = false;
+                            System.out.println("Terima kasih..");
+                            break;
+                        } else {
+                            System.out.println("Ketik y atau n saja");
+                        }
                     }
-                    
-                    break;
-                case 3: 
-                    System.out.println("\n====== HAPUS MENU ======");
-                    System.out.print("Menu yang terdaftar : ");
-                    
-                    for (int i = 1; i <= menuService.getNumberOfMenus(); i++) {
-                        System.out.println((i) + ". " + menuService.getMenuById(i));
-                    }
-
-                    System.out.print("Masukan id menu yang ingin dihapus : ");
-                    id = sc.nextInt();
-                    sc.nextLine();
-
-                    if (konfirmasi("menghapus menu")) {
-                        menuService.deleteMenu(id);
-                    }
-
-                    break;
-                default:
-                    System.out.println("Pilihan tidak tersedia...");
+                } catch (Exception exception) {
+                    System.out.print(exception.getMessage());
+                }
             }
-
-        } while (pilihanSubMenu > 3 || pilihanSubMenu < 1);
+        } finally {
+            sc.close(); // Menutup Scanner
+        }
     }
 }

@@ -11,5 +11,4 @@ public interface MenuService {
     Integer getNumberOfMenus();
     void updateMenu(Integer id, Menu menu);
     void deleteMenu(Integer id);
-    void deleteAllMenus();
 }

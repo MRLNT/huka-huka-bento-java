@@ -17,7 +17,6 @@ public class MenuServiceImplementation implements MenuService {
 
     @Override
     public void createMenu(Menu menu) {
-        checkInputError(menu);
         menuDao.save(menu);
     }
 
@@ -50,65 +49,32 @@ public class MenuServiceImplementation implements MenuService {
         menuDao.delete(id);
     }
     
-    @Override
-    public void deleteAllMenus() {
-        menuDao.deleteAll();
-    }
-    
     private void checkId(Integer id) {
         if (id > this.getNumberOfMenus() || id < 1) {
-            //throw new MenuException("Menu tidak tersedia...\n\n");
-        }
-    }
-
-    private void checkInputError(Menu menu) {
-        String errMess = "";
-
-        if (menu.getName() == "" && menu.getPrice() == null && menu.getType() == "") {
-            errMess = errMess + "Nama, harga, dan tipe menu tidak boleh kosong...";
-        } else {
-            if (menu.getName() == "") {
-                errMess = errMess + "Nama menu tidak boleh kosong. ";
-            }
-
-            if (menu.getPrice() == null) {
-                errMess = errMess + "Harga menu tidak boleh kosong. ";
-            } else {
-                if (menu.getPrice() < 0) {
-                    errMess = errMess + "Harga menu tidak boleh kurang dari 0. ";
-                }
-            }
-
-            if (menu.getType() == "") {
-                errMess = errMess + "Tipe menu tidak boleh kosong. ";
-            }
-        }
-
-        if (errMess != "") {
-            //throw new MenuException(errMess + "\n");
+            throw new IllegalArgumentException("Menu belum ada");
         }
     }
 
     private void checkUpdateData(Integer id, Menu menu) {
         String errMess = "";
 
-        if (menu.getName() == "" && menu.getPrice() == null && menu.getType() == "") {
+        if (menu.getNama() == "" && menu.getHarga() == null && menu.getJenis() == "") {
             System.out.println("Tidak ada data yang diubah");
         } else {
-            if (menu.getName() == "") {
-                menu.setName(this.getMenuById(id).getName());
+            if (menu.getNama() == "") {
+                menu.setNama(this.getMenuById(id).getNama());
             }
 
-            if (menu.getPrice() == null) {
-                menu.setPrice(this.getMenuById(id).getPrice());
+            if (menu.getHarga() == null) {
+                menu.setHarga(this.getMenuById(id).getHarga());
             } else {
-                if (menu.getPrice() < 0) {
+                if (menu.getHarga() < 0) {
                     errMess = errMess + "Harga menu tidak boleh kurang dari 0";
                 }
             }
 
-            if (menu.getType() == "") {
-                menu.setType(this.getMenuById(id).getType());
+            if (menu.getJenis() == "") {
+                menu.setJenis(this.getMenuById(id).getJenis());
             }
         }
 

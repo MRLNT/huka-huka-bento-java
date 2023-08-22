@@ -7,40 +7,35 @@ import services.BaseDao;
 import models.Menu;
 
 public class MenuDao implements BaseDao<Menu, Integer> {
-    List<Menu> menus = new ArrayList<>();
+    List<Menu> menu = new ArrayList<>();
 
     @Override
-    public void save(Menu data) {
-        this.menus.add(data);
+    public void update(Integer id, Menu data) {
+        this.menu.set(id - 1, data);
     }
 
     @Override
     public List<Menu> findAll() {
-        return this.menus;
-    }
-
-    @Override
-    public Menu findById(Integer id) {
-        return this.menus.get(id - 1);
+        return this.menu;
     }
 
     @Override
     public Integer getSize() {
-        return this.menus.size();
+        return this.menu.size();
     }
 
     @Override
-    public void update(Integer id, Menu data) {
-        this.menus.set(id - 1, data);
+    public void save(Menu data) {
+        this.menu.add(data);
+    }
+
+    @Override
+    public Menu findById(Integer id) {
+        return this.menu.get(id - 1);
     }
 
     @Override
     public void delete(Integer id) {
-        this.menus.remove(id - 1);
-    }
-
-    @Override
-    public void deleteAll() {
-        this.menus.clear();
+        this.menu.remove(id - 1);
     }
 }
