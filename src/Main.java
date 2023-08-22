@@ -100,17 +100,12 @@ public class Main {
         }        
         System.out.flush();
     }
-
-
     
-
-    
-    
-    private static void manajemenPesanan() {
+    private static void menuPesan() {
         Integer pilihanSubMenu;
 
         do {
-            DaftarMenu.menuPesan();
+            DaftarOutput.menuPesan();
             pilihanSubMenu = sc.nextInt();
             sc.nextLine();
             switch (pilihanSubMenu) {
@@ -150,7 +145,7 @@ public class Main {
         return ppn;
     }
     
-    private static void printListPesanan() {
+    private static void tampilkanPesanan() {
         if (orderService.getNumberOfOrders() > 0) { 
             System.out.println("\n=== PESANAN ANDA ===");
             
@@ -176,12 +171,12 @@ public class Main {
         jumlah = sc.nextInt();
         sc.nextLine();
 
-        if (pengulangan("menambah pesanan")) {
+        if (pengulangan("tambah pesanan")) {
             List<Menu> filteredMenus = filterMenu(type);
 
             Pesanan order = new Pesanan(filteredMenus.get(idMenu - 1), jumlah);
             orderService.createOrder(order);
-            printListPesanan();
+            tampilkanPesanan();
         }
     }
 
@@ -189,7 +184,7 @@ public class Main {
         Integer pilihanSubMenu;
 
         do {
-            DaftarMenu.menuPesan();
+            DaftarOutput.menuPesan();
             pilihanSubMenu = sc.nextInt();
             sc.nextLine();
 
@@ -213,33 +208,29 @@ public class Main {
     private static void ubahPesanan() {
         Integer id, idMenu, jumlah;
 
-        if (orderService.getNumberOfOrders() > 0) {
-            printListPesanan();
-            System.out.print("Masukan id pesanan yang ingin diubah : ");
-            id = sc.nextInt();
-            sc.nextLine();
+        tampilkanPesanan();
+        System.out.print("Masukan id pesanan yang ingin diubah : ");
+        id = sc.nextInt();
+        sc.nextLine();
 
-            System.out.println("\nMenu yang terdaftar : ");
-            for (int i = 1; i <= menuService.getNumberOfMenus(); i++) {
-                System.out.println((i) + ". " + menuService.getMenuById(i));
-            }
+        System.out.println("\nMenu yang terdaftar : ");
+        for (int i = 1; i <= menuService.getNumberOfMenus(); i++) {
+            System.out.println((i) + ". " + menuService.getMenuById(i));
+        }
 
-            System.out.print("\nMasukan id menu : ");
-            idMenu = sc.nextInt();
-            sc.nextLine();
+        System.out.print("\nMasukan id menu : ");
+        idMenu = sc.nextInt();
+        sc.nextLine();
 
-            System.out.print("Masukan jumlah pesanan : ");
-            jumlah = sc.nextInt();
-            sc.nextLine();
+        System.out.print("Masukan jumlah pesanan : ");
+        jumlah = sc.nextInt();
+        sc.nextLine();
 
-            if (pengulangan("mengubah pesanan")) {
-                Pesanan order = new Pesanan(menuService.getMenuById(idMenu), jumlah);
-                orderService.updateOrder(id, order);
+        if (pengulangan("mengubah pesanan")) {
+            Pesanan order = new Pesanan(menuService.getMenuById(idMenu), jumlah);
+            orderService.updateOrder(id, order);
 
-                printListPesanan();
-            }
-        } else {
-            System.out.println("Tidak bisa ubah pesanan karena belum ada data...");
+            tampilkanPesanan();
         }
     }
 
@@ -247,59 +238,56 @@ public class Main {
         Integer id;
 
         if (orderService.getNumberOfOrders() > 0) {
-            printListPesanan();
+            tampilkanPesanan();
             System.out.print("Masukan id pesanan yang ingin dihapus : ");
             id = sc.nextInt();
             sc.nextLine();
 
-            if (pengulangan("menghapus pesanan")) {
+            if (pengulangan("hapus pesanan")) {
                 orderService.deleteOrder(id);
 
-                printListPesanan();
+                tampilkanPesanan();
             } 
         } else {
             System.out.println("Tidak bisa hapus pesanan karena belum ada data...");
         }
     }
 
-    private static void strukPembayaran(Double uangCustomer) {
+    private static void strukPembayaran(Double totalBayar) {
         System.out.println("\n=== BUKTI PEMBAYARAN ===");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE, dd MMM uuuu HH:mm:ss");
         System.out.println("Tanggal : " + LocalDateTime.now().format(formatter));
 
-        printListPesanan();
+        tampilkanPesanan();
 
         System.out.println("Biaya PPN (11%) : Rp " + tambahPPN());
         System.out.println("Total harga : Rp " + (hargaSebelumPPN() + tambahPPN()));
-        System.out.println("Uang Tunai : Rp " + uangCustomer);
-        System.out.println("Kembalian : Rp " + (uangCustomer - (hargaSebelumPPN() + tambahPPN())));
+        System.out.println("Uang Tunai : Rp " + totalBayar);
+        System.out.println("Kembalian : Rp " + (totalBayar - (hargaSebelumPPN() + tambahPPN())));
         System.out.println("Terima Kasih..");
     }
 
     private static void pembayaran() {
-        Double uangCustomer;
+        Double totalBayar;
         
-        printListPesanan();
+        tampilkanPesanan();
         
-        if (orderService.getNumberOfOrders() > 0) {
-            do {
+        do {
                 System.out.print("Masukan Uang : Rp ");
-                uangCustomer = sc.nextDouble();        
+                totalBayar = sc.nextDouble();        
                 sc.nextLine();
 
-                if (paymentService.bayar((hargaSebelumPPN() + tambahPPN()), uangCustomer) != true) {
+                if (paymentService.bayar((hargaSebelumPPN() + tambahPPN()), totalBayar) != true) {
                     System.out.println("Uang Kurang...");
                 } else {
-                    strukPembayaran(uangCustomer);
+                    strukPembayaran(totalBayar);
                 }
 
-            } while (paymentService.bayar((hargaSebelumPPN() + tambahPPN()), uangCustomer) != true);
-        }         
+            } while (paymentService.bayar((hargaSebelumPPN() + tambahPPN()), totalBayar) != true);      
     }
 
 
     public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
         menuTambah();
         try {
             boolean ulang = true;
@@ -307,7 +295,7 @@ public class Main {
                 try {
                     boolean ulang2 = true;
                     while (ulang2) {
-                        DaftarMenu.menuUtama();
+                        DaftarOutput.menuUtama();
                         int pilihanMenu = sc.nextInt();
                         sc.nextLine();
 
@@ -316,7 +304,7 @@ public class Main {
                                 lihatDaftarMenu();
                                 break;
                             case 2:
-                                manajemenPesanan();
+                                menuPesan();
                                 break;
                             case 3:
                                 pembayaran();
@@ -326,12 +314,12 @@ public class Main {
                                 ulang = false;
                                 break;
                             default:
-                                System.out.println("Salah input..\n");
+                                DaftarOutput.salahInput();
                         }
                     }
 
                     while (ulang) {
-                        System.out.print("\nApakah lihat menu, pesan lagi, atau bayar ? (y/n)");
+                        System.out.print("\nApakah mau lihat menu, pesan lagi, atau bayar ? (y/n)");
                         String again = sc.nextLine();
 
                         if ("y".equalsIgnoreCase(again)) {
@@ -349,7 +337,7 @@ public class Main {
                 }
             }
         } finally {
-            sc.close(); // Menutup Scanner
+            sc.close();
         }
     }
 }

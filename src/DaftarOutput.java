@@ -1,4 +1,7 @@
-public class DaftarMenu {
+public class DaftarOutput {
+    public static void salahInput(){
+        System.out.println("Salah input..\\n");
+    }
 
     public static void menuUtama() {
         System.out.println("");
