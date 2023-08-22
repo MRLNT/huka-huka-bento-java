@@ -27,7 +27,6 @@ public class PemesananServiceImplementation implements PemesananService{
 
     @Override
     public Pesanan getOrderById(Integer id) {
-        checkId(id);
         return this.orderDao.findById(id);
     }
 
@@ -38,20 +37,13 @@ public class PemesananServiceImplementation implements PemesananService{
 
     @Override
     public void updateOrder(Integer id, Pesanan order) {
-        checkId(id);
-        
         this.orderDao.update(id, order);   
     }
 
     @Override
     public void deleteOrder(Integer id) {
-        checkId(id);
         this.orderDao.delete(id);
     }
 
-    private void checkId(Integer id) {
-        if (id > this.getNumberOfOrders() || id < 1) {
-            throw new IllegalArgumentException("Pesanan belum ada");
-        }
-    }
+
 }
