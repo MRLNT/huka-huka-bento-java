@@ -4,7 +4,7 @@ import java.util.List;
 
 import models.Pesanan;
 
-public interface OrderService {
+public interface PemesananService {
     void createOrder(Pesanan order);
     List<Pesanan> getAllOrders();
     Pesanan getOrderById(Integer id);

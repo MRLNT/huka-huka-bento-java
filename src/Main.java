@@ -9,10 +9,10 @@ import dao.MenuDao;
 import dao.PesananDao;
 import services.menu.MenuService;
 import services.menu.MenuServiceImplementation;
-import services.pembayaran.PaymentService;
-import services.pembayaran.PaymentServiceImplementation;
-import services.pemesanan.OrderService;
-import services.pemesanan.OrderServiceImplementation;
+import services.pembayaran.PembayaranService;
+import services.pembayaran.PembayaranServiceImplementation;
+import services.pemesanan.PemesananService;
+import services.pemesanan.PemesananServiceImplementation;
 import models.Menu;
 import models.Pesanan;
 
@@ -23,9 +23,9 @@ public class Main {
     static MenuService menuService = new MenuServiceImplementation(menuDao);
 
     static PesananDao orderDao = new PesananDao();
-    static OrderService orderService = new OrderServiceImplementation(orderDao);
+    static PemesananService orderService = new PemesananServiceImplementation(orderDao);
 
-    static PaymentService paymentService = new PaymentServiceImplementation();
+    static PembayaranService paymentService = new PembayaranServiceImplementation();
 
     private static void lihatDaftarMenu() {
         daftarMenu("Makanan");
@@ -57,17 +57,16 @@ public class Main {
         Boolean pengulangan = false;
         String pilihan;
 
-        System.out.print("Apakah anda ingin " + menu + " (y/n): ");
+        System.out.print("Apakah anda ingin " + menu + " (yes / no): ");
         pilihan = sc.nextLine();
 
-        if ("y".equalsIgnoreCase(pilihan)) {
+        if ("yes".equalsIgnoreCase(pilihan)) {
             pengulangan = true;
-        } else if ("n".equalsIgnoreCase(pilihan)) {
+        } else if ("no".equalsIgnoreCase(pilihan)) {
             pengulangan = false;
         } else {
-            System.out.println("Ketik y atau n saja");
+            DaftarOutput.salahInput();
         }
-        
         return pengulangan;
     }
 
@@ -319,17 +318,17 @@ public class Main {
                     }
 
                     while (ulang) {
-                        System.out.print("\nApakah mau lihat menu, pesan lagi, atau bayar ? (y/n)");
+                        System.out.print("\nApakah mau lihat menu, pesan lagi, atau bayar ? (yes / no)");
                         String again = sc.nextLine();
 
-                        if ("y".equalsIgnoreCase(again)) {
+                        if ("yes".equalsIgnoreCase(again)) {
                             break;
-                        } else if ("n".equalsIgnoreCase(again)) {
+                        } else if ("no".equalsIgnoreCase(again)) {
                             ulang = false;
                             System.out.println("Terima kasih..");
                             break;
                         } else {
-                            System.out.println("Ketik y atau n saja");
+                            DaftarOutput.salahInput();
                         }
                     }
                 } catch (Exception exception) {

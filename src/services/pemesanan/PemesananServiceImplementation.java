@@ -5,13 +5,13 @@ import java.util.List;
 import dao.PesananDao;
 import models.Pesanan;
 
-public class OrderServiceImplementation implements OrderService{
+public class PemesananServiceImplementation implements PemesananService{
     PesananDao orderDao;
     
-    public OrderServiceImplementation() {
+    public PemesananServiceImplementation() {
     }
 
-    public OrderServiceImplementation(PesananDao orderDao) {
+    public PemesananServiceImplementation(PesananDao orderDao) {
         this.orderDao = orderDao;
     }
 
